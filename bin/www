@@ -1,9 +1,5 @@
 #!/usr/bin/env node
 
-/**
- * Module dependencies.
- */
-
 var app = require("../app");
 var debug = require("debug")("chatroom:server");
 var http = require("http");
@@ -17,24 +13,21 @@ const {
 } = require("../utils/users");
 
 const reg1 = RegExp(/💩/);
-/**
- * Get port from environment and store in Express.
- */
+const reg2 = RegExp(/傻逼/);
 
-var port = normalizePort(process.env.PORT || "4231");
+
+var port = normalizePort(process.env.PORT || "4096");
 app.set("port", port);
-
-/**
- * Create HTTP server.
- */
-
 var server = http.createServer(app);
 const io = socketio(server);
 
 const botName = "Rick Ashley";
 
+// Begin to emit events
 io.on("connection", (socket) => {
+
   socket.on("joinroom", ({ username, room }) => {
+
     const user = userJoin(socket.id, username, room);
 
     socket.join(user.room);
@@ -65,6 +58,9 @@ io.on("connection", (socket) => {
     if (msg.match(reg1)){
       io.emit('message', formatMessage(botName, `@${user.username}, 你💩你🐎呢`));
   }
+  if (msg.match(reg2)){
+    io.emit('message', formatMessage(botName, `@${user.username}, 反弹！`));
+}
   });
   // Runs when client disconnects
   socket.on("disconnect", () => {

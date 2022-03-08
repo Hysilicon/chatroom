@@ -42,7 +42,12 @@ chatForm.addEventListener("submit", (e) => {
 const outputMessage = (message) => {
   // Create a new div and append it to the html
   const newDiv = document.createElement("div");
-  newDiv.classList.add("message");
+  if (message.username == "Rick Ashley") {
+    newDiv.classList.add("botMessage");
+  } else {
+    newDiv.classList.add("message");
+  }
+
   newDiv.innerHTML = `<p class="meta">${message.username} <span> ${message.time}</span></p>
     <p class="text">
       ${message.text}
