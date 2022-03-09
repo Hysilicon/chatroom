@@ -14,7 +14,7 @@ const {
 
 const reg1 = RegExp(/💩/);
 const reg2 = RegExp(/傻逼/);
-
+const reg3 = RegExp(/习近平/);
 
 var port = normalizePort(process.env.PORT || "4096");
 app.set("port", port);
@@ -25,15 +25,17 @@ const botName = "Rick Ashley";
 
 // Begin to emit events
 io.on("connection", (socket) => {
-
   socket.on("joinroom", ({ username, room }) => {
-
     const user = userJoin(socket.id, username, room);
 
     socket.join(user.room);
     socket.emit("message", formatMessage(botName, `Welcome! ${user.username}`));
 
-    // Log in
+    const hour = new Date().getHours();
+    if (hour >= 22 ||0<=hour<=4) {
+      socket.emit("message", formatMessage(botName, `Now is ${hour} o'clock, please do not overnight`));
+    }
+
     socket.broadcast
       .to(user.room)
       .emit(
@@ -46,8 +48,6 @@ io.on("connection", (socket) => {
       room: user.room,
       users: getRoomUsers(user.room),
     });
-
-    
   });
 
   // Listen for chat messages
@@ -55,13 +55,20 @@ io.on("connection", (socket) => {
     const user = getCurrentUserById(socket.id);
 
     io.to(user.room).emit("message", formatMessage(user.username, msg));
-    if (msg.match(reg1)){
-      io.emit('message', formatMessage(botName, `@${user.username}, 你💩你🐎呢`));
-  }
-  if (msg.match(reg2)){
-    io.emit('message', formatMessage(botName, `@${user.username}, 反弹！`));
-}
+    if (msg.match(reg1)) {
+      io.emit(
+        "message",
+        formatMessage(botName, `@${user.username}, 你💩你🐎呢`)
+      );
+    }
+    if (msg.match(reg2)) {
+      io.emit("message", formatMessage(botName, `@${user.username}, 反弹！`));
+    }
+    if (msg.match(reg3)) {
+      io.emit("message", formatMessage(botName, `@${user.username}, 😭`));
+    }
   });
+
   // Runs when client disconnects
   socket.on("disconnect", () => {
     const user = userLeave(socket.id);

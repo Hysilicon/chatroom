@@ -1,7 +1,6 @@
 const users = [];
 
 //join users to chat
-
 const userJoin = (id, username, room) => {
   const user = { id, username, room };
 
